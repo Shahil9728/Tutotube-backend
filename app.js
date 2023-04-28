@@ -102,7 +102,6 @@ async function run(videoUrl, query) {
         const store = await storembedding('transcript.txt');
         console.log(store);
         const data = await fetchquery(query);
-        console.log(data);
         return data;
     } catch (error) {
         console.log("Error occurred: ", error);
