@@ -40,7 +40,9 @@ const query = "What do you like about the company you're working for?";
 const storembedding = async (textFile) => {
     try {
         const loader = new TextLoader(textFile);
+        console.log(loader);
         const documents = await loader.load();
+        console.log(documents);
         const textSplitter = new RecursiveCharacterTextSplitter({
             chunk_size: 1000,
             chunk_overlap: 10,
