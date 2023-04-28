@@ -54,14 +54,14 @@ const storembedding = async (textFile) => {
             environment: PINECONE_API_ENV,
             apiKey: PINECONE_API_KEY,
         });
-        console.log("hii");
         const index_name = process.env.INDEX_NAME;
         const pineconeIndex = client.Index(index_name);
-        console.log(pineconeIndex);
+        console.log("Before from Documents");
         await PineconeStore.fromDocuments(texts, embeddings, {
             pineconeIndex,
             namespace: "Third",
         });
+        console.log("Embeddings saved")
         return "Suucessfully saved embeddings";
     } catch (error) {
         console.log(error)
