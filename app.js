@@ -159,36 +159,36 @@ async function transcribeAudio(videoUrl) {
     }
 }
 
-// async function storeTranscription(transcription) {
-//     try {
-//         fs.writeFileSync('transcript.txt', transcription);
-//         console.log('File created and transcript written successfully!');
-//     } catch (error) {
-//         console.error('Error writing file:', error);
-//         return;
-//     }
-//     try {
-//         // connect to the database
-//         const client = await mongoose.connect(process.env.MONGO_URL, {
-//             useNewUrlParser: true,
-//             useUnifiedTopology: true,
-//         });
-//         console.log("Database connection is Successful");
-//         const transcriptionSchema = new mongoose.Schema({
-//             text: String
-//         });
-//         const Transcription = mongoose.model('transcription', transcriptionSchema);
-//         const transcriptionData = new Transcription({
-//             text: transcription
-//         });
-//         await transcriptionData.save();
-//         console.log('Transcription data saved successfully in database!');
-//     } catch (error) {
-//         console.error('Error saving transcription data:', error);
-//     } finally {
-//         mongoose.connection.close();
-//     }
-// }
+async function storeTranscription(transcription) {
+    try {
+        fs.writeFileSync('transcript.txt', transcription);
+        console.log('File created and transcript written successfully!');
+    } catch (error) {
+        console.error('Error writing file:', error);
+        return;
+    }
+    try {
+        // connect to the database
+        const client = await mongoose.connect(process.env.MONGO_URL, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        console.log("Database connection is Successful");
+        const transcriptionSchema = new mongoose.Schema({
+            text: String
+        });
+        const Transcription = mongoose.model('transcription', transcriptionSchema);
+        const transcriptionData = new Transcription({
+            text: transcription
+        });
+        await transcriptionData.save();
+        console.log('Transcription data saved successfully in database!');
+    } catch (error) {
+        console.error('Error saving transcription data:', error);
+    } finally {
+        mongoose.connection.close();
+    }
+}
 
 // // Fetch data from file. Convert into chunks. Create embeddings for both query and textchunks. Then perform 
 // // semantic searh and fetch the best document. Send the query and document to the openai and fetch result.
