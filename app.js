@@ -59,7 +59,7 @@ const storembedding = async (textFile) => {
         console.log("Before from Documents");
         await PineconeStore.fromDocuments(texts, embeddings, {
             pineconeIndex,
-            namespace: "Third",
+            namespace: "Fourth",
         });
         console.log("Embeddings saved")
         return "Suucessfully saved embeddings";
