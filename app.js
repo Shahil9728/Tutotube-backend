@@ -40,9 +40,7 @@ const query = "What do you like about the company you're working for?";
 const storembedding = async (textFile) => {
     try {
         const loader = new TextLoader(textFile);
-        console.log(loader);
         const documents = await loader.load();
-        console.log(documents);
         const textSplitter = new RecursiveCharacterTextSplitter({
             chunk_size: 1000,
             chunk_overlap: 10,
@@ -56,8 +54,10 @@ const storembedding = async (textFile) => {
             environment: PINECONE_API_ENV,
             apiKey: PINECONE_API_KEY,
         });
+        console.log("hii");
         const index_name = process.env.INDEX_NAME;
         const pineconeIndex = client.Index(index_name);
+        console.log(pineconeIndex);
         await PineconeStore.fromDocuments(texts, embeddings, {
             pineconeIndex,
             namespace: "Third",
