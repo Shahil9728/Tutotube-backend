@@ -95,7 +95,7 @@ const fetchquery = async (que) => {
     return responseAns.text
 }
 
-async function run(videoUrl, query) {
+async function run1(videoUrl, query) {
     try {
         await transcribeAudio(videoUrl);
         console.log("Fetching query");
@@ -103,21 +103,20 @@ async function run(videoUrl, query) {
         console.log(store);
         const data = await fetchquery(query);
         console.log(data);
-        return data;
     } catch (error) {
         console.log("Error occurred: ", error);
     }
 }
+// run1(videoUrl, query);
+
 
 app.post('/api', async (req, res) => {
     const videoUrl = req.body.link;
     const query = req.body.query;
-    const answer = await run(videoUrl, query);
-    // const text = answer.split('\n');
-    // const correctans = text.reduce((a, b) => a.length > b.length ? a : b, '');
-    // res.json({ correctans });
-    console.log(answer)
-    const correctans = answer;
+    const answer = await run1(videoUrl, query);
+    const text = answer.split('\n');
+    const correctans = text.reduce((a, b) => a.length > b.length ? a : b, '');
+    console.log(correctans)
     res.json({ correctans });
 })
 
@@ -139,8 +138,7 @@ app.get('/', async (req, res) => {
 //         console.log("Error occurred: ", error);
 //     }
 // }
-// run();
-
+// run(videoUrl,query);
 
 
 // Download the youtube video and get the audio and then convert the audio into text and save transcript in the file
@@ -159,6 +157,8 @@ async function transcribeAudio(videoUrl) {
     }
 }
 
+
+// Store the transcription data into the file and then in the mongodb database.
 // async function storeTranscription(transcription) {
 //     try {
 //         fs.writeFileSync('transcript.txt', transcription);
@@ -190,8 +190,8 @@ async function transcribeAudio(videoUrl) {
 //     }
 // }
 
-// // Fetch data from file. Convert into chunks. Create embeddings for both query and textchunks. Then perform 
-// // semantic searh and fetch the best document. Send the query and document to the openai and fetch result.
+// Fetch data from file. Convert into chunks. Create embeddings for both query and textchunks. Then perform 
+// semantic searh and fetch the best document. Send the query and document to the openai and fetch result.
 // async function getanswer(query) {
 //     try {
 //         const data = await fs.promises.readFile("transcript.txt");
