@@ -6,7 +6,6 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
-import { Configuration, OpenAIApi } from 'openai';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { YoutubeTranscript } from 'youtube-transcript';
 import { TextLoader } from 'langchain/document_loaders/fs/text'
@@ -28,11 +27,6 @@ app.use(cors());
 mongoose.set('strictQuery', false);
 
 
-
-const configuration = new Configuration({
-    apiKey: openaiApiKey,
-});
-const openai = new OpenAIApi(configuration);
 const videoUrl = 'https://www.youtube.com/watch?v=ry9SYnV3svc';
 const query = "What do you like about the company you're working for?";
 
@@ -114,9 +108,6 @@ app.post('/api', async (req, res) => {
     const videoUrl = req.body.link;
     const query = req.body.query;
     const answer = await run(videoUrl, query);
-    // const text = answer.split('\n');
-    // const correctans = text.reduce((a, b) => a.length > b.length ? a : b, '');
-    // res.json({ correctans });
     console.log(answer)
     const correctans = answer;
     res.json({ correctans });
@@ -126,21 +117,6 @@ app.post('/api', async (req, res) => {
 app.get('/', async (req, res) => {
     res.render('index.hbs');
 })
-
-
-
-
-// const run = async (videoUrl, query) => {
-//     try {
-//         await transcribeAudio(videoUrl);
-//         console.log("Fetching query");
-//         const res = await getanswer(query);
-//         return res;
-//     } catch (error) {
-//         console.log("Error occurred: ", error);
-//     }
-// }
-// run();
 
 
 
@@ -179,93 +155,22 @@ async function storeTranscription(transcription) {
             text: String
         });
         const Transcription = mongoose.model('transcription', transcriptionSchema);
-        const transcriptionData = new Transcription({
-            text: transcription
-        });
-        await transcriptionData.save();
-        console.log('Transcription data saved successfully in database!');
+        const existingTranscription = await Transcription.findOne({ text: transcription });
+        if (existingTranscription) {
+            console.log('Transcription data already exists in the database.');
+        } else {
+            const transcriptionData = new Transcription({
+                text: transcription
+            });
+            await transcriptionData.save();
+            console.log('Transcription data saved successfully in the database!');
+        }
     } catch (error) {
         console.error('Error saving transcription data:', error);
     } finally {
         mongoose.connection.close();
     }
 }
-
-// // Fetch data from file. Convert into chunks. Create embeddings for both query and textchunks. Then perform 
-// // semantic searh and fetch the best document. Send the query and document to the openai and fetch result.
-// async function getanswer(query) {
-//     try {
-//         const data = await fs.promises.readFile("transcript.txt");
-//         const textSplitter = new RecursiveCharacterTextSplitter({
-//             chunkSize: 1000,
-//             chunkOverlap: 200,
-//         });
-//         const textChunks = await textSplitter.splitText(data.toString());
-//         const embeddings = await Promise.all(
-//             textChunks.map(async (doc) => {
-//                 try {
-//                     const resp = await openai.createEmbedding({
-//                         model: "text-embedding-ada-002",
-//                         input: doc,
-//                     });
-//                     const embedding = resp?.data?.data[0]?.embedding;
-//                     if (!Array.isArray(embedding)) {
-//                         console.error(`Failed to generate embedding for document: ${doc}`);
-//                         return null;
-//                     }
-//                     return embedding;
-//                 } catch (error) {
-//                     console.log(`Error generating embedding for document: ${doc}`, error);
-//                     throw error;
-//                 }
-//             })
-//         );
-//         const resp = await openai.createEmbedding({
-//             model: "text-embedding-ada-002",
-//             input: query,
-//         });
-//         const queryEmbedding = resp?.data?.data[0]?.embedding;
-//         function cosineSimilarity(a, b) {
-//             let dotProduct = 0;
-//             let normA = 0;
-//             let normB = 0;
-//             for (let i = 0; i < a.length; i++) {
-//                 dotProduct += a[i] * b[i];
-//                 normA += a[i] * a[i];
-//                 normB += b[i] * b[i];
-//             }
-//             return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-//         }
-//         const similarityScores = embeddings.map((embedding) => {
-//             if (!embedding) {
-//                 return NaN;
-//             }
-//             return cosineSimilarity(queryEmbedding, embedding);
-//         });
-//         const index = similarityScores.indexOf(Math.max(...similarityScores));
-//         const answer = textChunks[index];
-//         try {
-//             const response = await openai.createCompletion({
-//                 model: "text-davinci-002",
-//                 prompt:
-//                     "Find the answer of this  " + query + " from this paragraph " + answer,
-//                 temperature: 1,
-//                 max_tokens: 150,
-//                 top_p: 1,
-//                 frequency_penalty: 0,
-//                 presence_penalty: 0,
-//             });
-//             const ans = response.data.choices[0].text;
-//             return ans;
-//         } catch (error) {
-//             console.log(`Error creating completion for query "${query}" and document "${answer}"`, error);
-//             throw error;
-//         }
-//     } catch (error) {
-//         console.log("Error occurred: ", error);
-//     }
-// }
-
 
 app.listen(port, (req, res) => {
     console.log(`Server is running at ${port}`);
