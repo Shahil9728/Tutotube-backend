@@ -36,7 +36,7 @@ app.set('view engine', 'hbs');
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 app.use(cors({
-    origin: 'https://tutotube.onrender.com/', // Replace with the domain of your React app
+    origin: 'https://tutotube.onrender.com', // Replace with the domain of your React app
     credentials: true, // Allow sending cookies with the request
 }));
 mongoose.set('strictQuery', false);
