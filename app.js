@@ -36,7 +36,7 @@ app.set('view engine', 'hbs');
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 app.use(cors({
-    origin: 'http://localhost:3000', // Replace with the domain of your React app
+    origin: 'https://tutotube.onrender.com/', // Replace with the domain of your React app
     credentials: true, // Allow sending cookies with the request
 }));
 mongoose.set('strictQuery', false);
@@ -109,7 +109,7 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
     req.session.userData = userData;
     console.log(req.session.userData);
     req.session.save(() => {
-        res.redirect(`http://localhost:3000/`);
+        res.redirect(`https://tutotube.onrender.com/`);
     });
 });
 
@@ -126,10 +126,10 @@ app.post('/signup', async (req, res) => {
     console.log(formData)
     const existingUser = await User.findOne({ email: formData.email });
     if (existingUser) {
-        res.status(200).json({ redirectUrl: 'http://localhost:3000/signin' });
+        res.status(200).json({ redirectUrl: 'https://tutotube.onrender.com/signin' });
     } else {
         const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(formData), cryptsecret_key).toString();
-        const redirectUrl = `http://localhost:3000/createprofile?data=${encodeURIComponent(encryptedData)}`;
+        const redirectUrl = `https://tutotube.onrender.com/createprofile?data=${encodeURIComponent(encryptedData)}`;
         res.status(200).json({ redirectUrl });
     }
 })
